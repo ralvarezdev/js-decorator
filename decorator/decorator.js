@@ -3,38 +3,76 @@ export const INVALID_METADATA_KEY_ERROR = new Error("Invalid metadata key");
 export const METADATA_KEY_ALREADY_EXISTS_ERROR = "Metadata key already exists"
 export const METADATA_KEY_NOT_FOUND_ERROR = "Metadata key not found"
 export const METADATA_NOT_FOUND_ERROR = "Metadata not found"
+export const INVALID_TARGET_OBJECT_ERROR = new Error("Invalid target object");
+export const PROPERTY_NOT_FOUND_ERROR = "Property not found"
+
+// Metadata key
+export const METADATA_KEY = "metadata";
+
+// GetPropertyPrototype gets the property prototype
+export function GetPropertyPrototype(target, property) {
+    // Get the class prototype
+    const prototype = target?.prototype;
+    if (!prototype)
+        throw INVALID_TARGET_OBJECT_ERROR
+
+    // Get the class prototype
+    const prototypeProperty = prototype?.[property];
+
+    // Check if the property is invalid
+    if (!prototypeProperty)
+        throw new Error(PROPERTY_NOT_FOUND_ERROR + ": " + property);
+
+    // Return the prototype property
+    return prototypeProperty;
+}
 
 // NewDecorator creates a new decorator
 export function NewDecorator(decoratorFn) {
-    return (target, key, descriptor) => decoratorFn(target, key, descriptor);
+    return (target, property) => {
+        // Get the property prototype
+        const prototypeProperty = GetPropertyPrototype(target, property);
+
+        // Decorate the property
+        return decoratorFn(target, property, prototypeProperty);
+    }
 }
 
 // AddMetadata adds metadata to a method
 export function AddMetadata(metadataKey, metadataValue) {
-    return NewDecorator((target, key, descriptor) => {
+    return NewDecorator((target, property, prototypeProperty) => {
         // Check if the key is invalid
         if (!metadataKey)
             throw INVALID_METADATA_KEY_ERROR;
-        if (!descriptor?.metadata)
-            descriptor["metadata"] = {};
-        else if (descriptor.metadata?.[metadataKey])
+
+        if (!prototypeProperty?.[METADATA_KEY])
+            prototypeProperty[METADATA_KEY] = {};
+
+        else if (prototypeProperty[METADATA_KEY]?.[metadataKey])
             throw new Error(METADATA_KEY_ALREADY_EXISTS_ERROR + ": " + metadataKey);
 
         // Add the metadata to the method
-        descriptor.metadata[metadataKey] = metadataValue
-
-        // Return the descriptor
-        return descriptor;
+        prototypeProperty[METADATA_KEY][metadataKey] = metadataValue
     });
 }
 
 // GetMetadata gets metadata from a method
-export function GetMetadata(descriptor) {
-    return descriptor?.metadata;
+export function GetMetadata(target, property) {
+    // Get the property prototype
+    const prototypeProperty = GetPropertyPrototype(target, property);
+
+    return prototypeProperty?.[METADATA_KEY];
 }
 
 // GetMetadataKeys gets metadata keys from a method
-export function GetMetadataKeys(descriptor, ...keys) {
+export function GetMetadataKeys(target, property, ...keys) {
+    // Get the property prototype
+    const prototypeProperty = GetPropertyPrototype(target, property);
+
+    // Check if the metadata is not found
+    if (!prototypeProperty?.[METADATA_KEY])
+            throw new Error(METADATA_NOT_FOUND_ERROR);
+
     // Create the metadata values array
     const metadata = {};
 
@@ -43,13 +81,12 @@ export function GetMetadataKeys(descriptor, ...keys) {
         // Check if the key is invalid
         if (!key)
             throw INVALID_METADATA_KEY_ERROR;
-        if (!descriptor?.metadata)
-            throw new Error(METADATA_NOT_FOUND_ERROR);
-        if (!descriptor.metadata?.[key])
+
+        if (!prototypeProperty[METADATA_KEY]?.[key])
             throw new Error(METADATA_KEY_NOT_FOUND_ERROR + ": " + key);
 
         // Add the metadata value to the array
-        metadata[key] = descriptor.metadata[key];
+        metadata[key] = prototypeProperty[METADATA_KEY][key];
     }
 
     // Return the metadata values
@@ -57,22 +94,10 @@ export function GetMetadataKeys(descriptor, ...keys) {
 }
 
 // GetMetadataKey gets a metadata key from a method
-export function GetMetadataKey(descriptor, key) {
+export function GetMetadataKey(target, property, key) {
     // Get the metadata keys
-    const values = GetMetadataKeys(descriptor, key);
+    const values = GetMetadataKeys(target, property, key);
 
     // Return the metadata value
     return values[key];
-}
-
-
-// Get the descriptor of a property
-export function GetDescriptor(classObject, property) {
-    return Object.getOwnPropertyDescriptor(classObject?.prototype, property);
-}
-
-// Decorate decorates a method with the given decorator
-export default function Decorate(classObject, property, decoratorFn) {
-    const descriptor = GetDescriptor(classObject, property);
-    Object.defineProperty(classObject?.prototype, property, decoratorFn(classObject?.prototype, property, descriptor));
 }

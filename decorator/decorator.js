@@ -2,6 +2,7 @@
 export const INVALID_METADATA_KEY_ERROR = new Error("Invalid metadata key");
 export const METADATA_KEY_ALREADY_EXISTS_ERROR = "Metadata key already exists"
 export const METADATA_KEY_NOT_FOUND_ERROR = "Metadata key not found"
+export const METADATA_NOT_FOUND_ERROR = "Metadata not found"
 
 // NewDecorator creates a new decorator
 export function NewDecorator(decoratorFn) {
@@ -35,10 +36,11 @@ export function AddMetadata(key, value) {
 }
 
 // GetMetadata gets metadata from a method
-export function GetMetadata(descriptor, key) {
+export function GetMetadata(descriptor) {
     return descriptor?.metadata;
 }
 
+// GetMetadataKeys gets metadata keys from a method
 export function GetMetadataKeys(descriptor, ...keys) {
     // Create the metadata values array
     const metadata = {};
@@ -48,7 +50,9 @@ export function GetMetadataKeys(descriptor, ...keys) {
         // Check if the key is invalid
         if (!key)
             throw INVALID_METADATA_KEY_ERROR;
-        if (!descriptor?.metadata[key])
+        if (descriptor?.metadata)
+            throw new Error(METADATA_NOT_FOUND_ERROR);
+        if (!descriptor.metadata?.[key])
             throw new Error(METADATA_KEY_NOT_FOUND_ERROR + ": " + key);
 
         // Add the metadata value to the array

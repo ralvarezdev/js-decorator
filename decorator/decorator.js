@@ -17,6 +17,9 @@ export function NewDecorator(decoratorFn) {
 
         // Call the decorator function
         decoratorFn(descriptor);
+
+        // Return the modified descriptor
+        return descriptor;
     };
 }
 

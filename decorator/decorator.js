@@ -29,7 +29,7 @@ export function AddMetadata(key, value) {
             descriptor.metadata = {};
         else if (descriptor.metadata[key])
             throw new Error(METADATA_KEY_ALREADY_EXISTS_ERROR + ": " + key);
-        
+
         descriptor.metadata[key] = value
     });
 }
@@ -38,13 +38,14 @@ export function AddMetadata(key, value) {
 export function GetMetadata(descriptor, key) {
     return descriptor?.metadata;
 }
-export function GetMetadataKeys(descriptor, ...keys) {
-        // Create the metadata values array
-        const metadata = {};
 
-        // Iterate over the keys
-        for (const key of keys) {
-            // Check if the key is invalid
+export function GetMetadataKeys(descriptor, ...keys) {
+    // Create the metadata values array
+    const metadata = {};
+
+    // Iterate over the keys
+    for (const key of keys) {
+        // Check if the key is invalid
         if (!key)
             throw INVALID_METADATA_KEY_ERROR;
         if (!descriptor?.metadata[key])
@@ -52,10 +53,10 @@ export function GetMetadataKeys(descriptor, ...keys) {
 
         // Add the metadata value to the array
         metadata[key] = descriptor.metadata[key];
-        }
+    }
 
-        // Return the metadata values
-        return metadata;
+    // Return the metadata values
+    return metadata;
 }
 
 

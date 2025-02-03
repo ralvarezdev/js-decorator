@@ -6,22 +6,22 @@ export const METADATA_NOT_FOUND_ERROR = "Metadata not found"
 
 // NewDecorator creates a new decorator
 export function NewDecorator(decoratorFn) {
-    return descriptor => decoratorFn(descriptor);
+    return (target, key, descriptor) => decoratorFn(target, key, descriptor);
 }
 
 // AddMetadata adds metadata to a method
-export function AddMetadata(key, value) {
-    return NewDecorator((descriptor) => {
+export function AddMetadata(metadataKey, metadataValue) {
+    return NewDecorator((target, key, descriptor) => {
         // Check if the key is invalid
-        if (!key)
+        if (!metadataKey)
             throw INVALID_METADATA_KEY_ERROR;
-        if (!descriptor.metadata)
-            descriptor.metadata = {};
-        else if (descriptor.metadata[key])
-            throw new Error(METADATA_KEY_ALREADY_EXISTS_ERROR + ": " + key);
+        if (!descriptor?.metadata)
+            descriptor["metadata"] = {};
+        else if (descriptor.metadata?.[metadataKey])
+            throw new Error(METADATA_KEY_ALREADY_EXISTS_ERROR + ": " + metadataKey);
 
         // Add the metadata to the method
-        descriptor.metadata[key] = value
+        descriptor.metadata[metadataKey] = metadataValue
 
         // Return the descriptor
         return descriptor;
@@ -43,7 +43,7 @@ export function GetMetadataKeys(descriptor, ...keys) {
         // Check if the key is invalid
         if (!key)
             throw INVALID_METADATA_KEY_ERROR;
-        if (descriptor?.metadata)
+        if (!descriptor?.metadata)
             throw new Error(METADATA_NOT_FOUND_ERROR);
         if (!descriptor.metadata?.[key])
             throw new Error(METADATA_KEY_NOT_FOUND_ERROR + ": " + key);
@@ -74,5 +74,5 @@ export function GetDescriptor(classObject, property) {
 // Decorate decorates a method with the given decorator
 export default function Decorate(classObject, property, decoratorFn) {
     const descriptor = GetDescriptor(classObject, property);
-    Object.defineProperty(classObject?.prototype, property, decoratorFn(descriptor));
+    Object.defineProperty(classObject?.prototype, property, decoratorFn(classObject?.prototype, property, descriptor));
 }

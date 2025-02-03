@@ -6,21 +6,7 @@ export const METADATA_NOT_FOUND_ERROR = "Metadata not found"
 
 // NewDecorator creates a new decorator
 export function NewDecorator(decoratorFn) {
-    return (descriptor) => {
-        // Get the descriptor of the property
-        const method = descriptor.value;
-
-        // Decorate the method
-        descriptor.value = function (...args) {
-            return method.apply(this, args);
-        };
-
-        // Call the decorator function
-        decoratorFn(descriptor);
-
-        // Return the modified descriptor
-        return descriptor;
-    };
+    return descriptor => decoratorFn(descriptor);
 }
 
 // AddMetadata adds metadata to a method
@@ -34,7 +20,11 @@ export function AddMetadata(key, value) {
         else if (descriptor.metadata[key])
             throw new Error(METADATA_KEY_ALREADY_EXISTS_ERROR + ": " + key);
 
+        // Add the metadata to the method
         descriptor.metadata[key] = value
+
+        // Return the descriptor
+        return descriptor;
     });
 }
 

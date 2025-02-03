@@ -1,3 +1,3 @@
 export {
-    default, NewDecorator, AddMetadata, GetMetadataKeys, GetDescriptor
+    default, NewDecorator, AddMetadata, GetMetadataKeys, GetMetadataKey, GetDescriptor
 } from "./decorator.js";

@@ -59,6 +59,15 @@ export function GetMetadataKeys(descriptor, ...keys) {
     return metadata;
 }
 
+// GetMetadataKey gets a metadata key from a method
+export function GetMetadataKey(descriptor, key) {
+    // Get the metadata keys
+    const values = GetMetadataKeys(descriptor, key);
+
+    // Return the metadata value
+    return values[key];
+}
+
 
 // Get the descriptor of a property
 export function GetDescriptor(classObject, property) {

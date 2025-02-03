@@ -1,6 +1,6 @@
 {
   "name": "@ralvarezdev/js-decorator",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Higher-order functions implementations for JavaScript projects",
   "main": "index.js",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@ralvarezdev/js-decorator",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Higher-order functions implementations for JavaScript projects",
   "main": "index.js",
   "scripts": {
@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/ralvarezdev/js-decorator/issues"
   },
-  "homepage": "https://github.com/ralvarezdev/js-decorator#readme"
+  "homepage": "https://github.com/ralvarezdev/js-decorator#readme",
+  "type": "module"
 }
